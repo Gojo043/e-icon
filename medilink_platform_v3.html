@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MediLink — Integrated Healthcare Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --deep:#07121f;--deep-2:#0d1e2e;--deep-3:#152336;--deep-4:#1c2f42;
+  --slate:#243550;--slate-2:#2e4160;
+  --mist:#e8edf5;--mist-2:#d8e2ef;--mist-3:#c4d2e3;
+  --surface:#ffffff;--surface-2:#f5f8fc;--surface-3:#edf2f8;
+  --text:#0a1828;--text-2:#2c4259;--text-3:#5b7a99;--text-4:#8fa9c4;
+  --teal:#00b8a4;--teal-glow:rgba(0,184,164,0.18);--teal-dk:#00927f;--teal-lt:#e5f8f6;
+  --sky:#1a77d4;--sky-lt:#e3f0fd;
+  --jade:#15a058;--jade-lt:#e3f5ec;
+  --amber:#d4860a;--amber-lt:#fdf3e0;
+  --crimson:#c42626;--crimson-lt:#fce8e8;
+  --violet:#6c3aed;--violet-lt:#ede8fd;
+  --border:#e0e9f4;--border-2:#c8d8ea;
+  --shadow:0 1px 3px rgba(7,18,31,0.06),0 4px 16px rgba(7,18,31,0.04);
+  --shadow-lg:0 8px 32px rgba(7,18,31,0.12);
+  --r:9px;--r-lg:14px;--r-xl:20px;
+  --sans:'Sora',sans-serif;--serif:'Crimson Pro',serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--surface-2);color:var(--text);font-size:13.5px;line-height:1.55}
+
+/* ── APP SHELL ── */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:238px;flex-shrink:0;background:var(--deep);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;position:relative;z-index:10}
+.content{flex:1;overflow-y:auto;padding:22px}
+
+/* ── SIDEBAR ── */
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+.sb-logo-row{display:flex;align-items:center;gap:11px}
+.sb-logo-mark{width:36px;height:36px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-mark svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
+.sb-logo-name{font-family:var(--serif);font-size:20px;color:#fff;letter-spacing:-0.2px;font-weight:600}
+.sb-logo-tag{font-size:8.5px;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+.sb-role{padding:12px 14px;margin:10px 12px 0;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:var(--r);display:flex;gap:3px}
+.sb-rb{flex:1;padding:6px 3px;font-size:9.5px;font-weight:500;text-align:center;border-radius:6px;cursor:pointer;color:rgba(255,255,255,0.38);transition:all .2s;border:none;background:none;font-family:var(--sans)}
+.sb-rb.on{background:var(--teal);color:#fff;font-weight:600}
+.sb-nav{flex:1;padding:6px 0}
+.sb-section{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:10px 20px 5px}
+.sb-link{display:flex;align-items:center;gap:10px;padding:9px 20px;color:rgba(255,255,255,0.46);font-size:12.5px;font-weight:400;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:var(--sans);transition:all .14s;position:relative}
+.sb-link:hover{color:rgba(255,255,255,0.82);background:rgba(255,255,255,0.04)}
+.sb-link.on{color:#fff;background:rgba(0,184,164,0.14)}
+.sb-link.on::before{content:'';position:absolute;left:0;top:22%;bottom:22%;width:2.5px;background:var(--teal);border-radius:0 3px 3px 0}
+.sb-ic{width:16px;flex-shrink:0}
+.sb-ic svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;display:block}
+.sb-badge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;color:#fff}
+.sb-badge.teal{background:var(--teal)}
+.sb-badge.amber{background:var(--amber)}
+.sb-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;display:flex;align-items:center;gap:10px}
+.sb-ava{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#0a7aac);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-uname{font-size:11.5px;font-weight:500;color:rgba(255,255,255,0.72)}
+.sb-urole{font-size:9.5px;color:rgba(255,255,255,0.28);margin-top:1px}
+
+/* ── TOPBAR ── */
+.tb-left{flex:1}
+.tb-title{font-size:14.5px;font-weight:600;color:var(--text)}
+.tb-sub{font-size:10.5px;color:var(--text-3);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);padding:7px 12px;color:var(--text-3);font-size:12px;width:210px;cursor:text}
+.tb-search svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.tb-icon{width:34px;height:34px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background .14s}
+.tb-icon:hover{background:var(--surface-2)}
+.tb-icon svg{width:14px;height:14px;stroke:var(--text-2);fill:none;stroke-width:2;stroke-linecap:round}
+.ndot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--crimson);border-radius:50%;border:2px solid var(--surface)}
+.tb-status{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;padding:5px 12px;border-radius:99px;background:var(--jade-lt);color:var(--jade);border:1px solid rgba(21,160,88,0.18)}
+.tb-status-dot{width:6px;height:6px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* ── DASH SWITCHING ── */
+.dash{display:none}.dash.on{display:block;animation:rise .22s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── KPI CARDS ── */
+.kpi-row{display:grid;gap:13px;margin-bottom:18px}
+.kpi4{grid-template-columns:repeat(4,1fr)}
+.kpi3{grid-template-columns:repeat(3,1fr)}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.kpi::after{content:'';position:absolute;top:-24px;right:-24px;width:80px;height:80px;border-radius:50%}
+.kpi.k-teal::after{background:var(--teal-glow)}
+.kpi.k-sky::after{background:rgba(26,119,212,0.12)}
+.kpi.k-amber::after{background:rgba(212,134,10,0.12)}
+.kpi.k-crimson::after{background:rgba(196,38,38,0.1)}
+.kpi.k-jade::after{background:rgba(21,160,88,0.1)}
+.kpi.k-violet::after{background:rgba(108,58,237,0.1)}
+.kpi-icon{position:absolute;top:18px;right:20px;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.kpi-icon svg{width:16px;height:16px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kpi-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.9px;color:var(--text-3);margin-bottom:7px}
+.kpi-value{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--text);line-height:1;letter-spacing:-0.5px}
+.kpi-delta{font-size:10.5px;font-weight:500;margin-top:6px}
+.kpi-delta.up{color:var(--jade)}.kpi-delta.dn{color:var(--crimson)}.kpi-delta.neu{color:var(--text-3)}
+
+/* ── GRID ── */
+.g{display:grid;gap:14px;margin-bottom:14px}
+.g-2{grid-template-columns:1fr 1fr}
+.g-3{grid-template-columns:1fr 1fr 1fr}
+.g-21{grid-template-columns:2fr 1fr}
+.g-12{grid-template-columns:1fr 2fr}
+.g-13{grid-template-columns:1fr 3fr}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.card-h{padding:16px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card-title{font-size:13px;font-weight:600;color:var(--text)}
+.card-subtitle{font-size:10.5px;color:var(--text-3);margin-top:1.5px}
+.card-body{padding:14px 20px}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:9px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--text-4);padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:var(--surface-2)}
+.tw{font-weight:500}.tsm{font-size:10.5px;color:var(--text-3);margin-top:1.5px}
+
+/* ── BADGES ── */
+.b{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:600;white-space:nowrap;letter-spacing:0.1px}
+.b-ok{background:var(--jade-lt);color:var(--jade)}
+.b-warn{background:var(--amber-lt);color:var(--amber)}
+.b-err{background:var(--crimson-lt);color:var(--crimson)}
+.b-info{background:var(--sky-lt);color:var(--sky)}
+.b-teal{background:var(--teal-lt);color:var(--teal-dk)}
+.b-vi{background:var(--violet-lt);color:var(--violet)}
+.b-neu{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border)}
+
+/* ── ALERTS ── */
+.al{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;border-radius:var(--r);font-size:12px;margin-bottom:9px}
+.al:last-child{margin-bottom:0}
+.al svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke-width:2;stroke-linecap:round;margin-top:1px}
+.al-err{background:var(--crimson-lt);color:var(--crimson);border:1px solid rgba(196,38,38,0.2)}.al-err svg{stroke:var(--crimson)}
+.al-warn{background:var(--amber-lt);color:var(--amber);border:1px solid rgba(212,134,10,0.2)}.al-warn svg{stroke:var(--amber)}
+.al-ok{background:var(--jade-lt);color:var(--jade);border:1px solid rgba(21,160,88,0.2)}.al-ok svg{stroke:var(--jade)}
+.al-info{background:var(--sky-lt);color:var(--sky);border:1px solid rgba(26,119,212,0.2)}.al-info svg{stroke:var(--sky)}
+
+/* ── PROGRESS ── */
+.prog-row{margin-bottom:14px}
+.prog-row:last-child{margin-bottom:0}
+.prog-meta{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;align-items:center}
+.prog-track{height:6px;background:var(--surface-3);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;transition:width .6s ease}
+
+/* ── STOCK ROWS ── */
+.sr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.sr:last-child{border-bottom:none}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sname{flex:1;font-size:12px;font-weight:500;color:var(--text)}
+.smeta{font-size:10.5px;color:var(--text-3);margin-top:1px}
+.sdist{font-size:11px;color:var(--text-3);min-width:44px;text-align:right}
+.sprice{font-size:12px;font-weight:600;color:var(--text);min-width:72px;text-align:right}
+
+/* ── TIMELINE ── */
+.tl{padding-left:20px;position:relative}
+.tl::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:1.5px;background:var(--border)}
+.tl-ev{position:relative;margin-bottom:13px}
+.tl-ev:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-17px;top:4px;width:10px;height:10px;border-radius:50%;border:2px solid var(--surface);background:var(--teal)}
+.tl-dot.sky{background:var(--sky)}.tl-dot.amb{background:var(--amber)}.tl-dot.crim{background:var(--crimson)}
+.tl-time{font-size:10px;color:var(--text-4);margin-bottom:2px}
+.tl-text{font-size:12px;color:var(--text-2);line-height:1.5}
+
+/* ── INTERACTION BOXES ── */
+.ix{border-radius:var(--r);padding:14px;margin-bottom:10px}
+.ix:last-child{margin-bottom:0}
+.ix-sev{background:var(--crimson-lt);border:1px solid rgba(196,38,38,0.22)}
+.ix-mod{background:var(--amber-lt);border:1px solid rgba(212,134,10,0.22)}
+.ix-title{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.ix-drugs{font-size:12px;font-weight:600;color:var(--text)}
+.ix-desc{font-size:11px;color:var(--text-2);margin-top:5px;line-height:1.65}
+
+/* ── RX HERO ── */
+.rx-hero{background:linear-gradient(135deg,var(--deep) 0%,var(--deep-3) 60%,var(--slate) 100%);border-radius:var(--r-xl);padding:22px 24px;color:#fff;position:relative;overflow:hidden;margin-bottom:14px}
+.rx-hero::before{content:'℞';position:absolute;right:16px;top:4px;font-family:var(--serif);font-size:72px;opacity:.05;color:#fff;pointer-events:none;line-height:1}
+.rx-label{font-size:8.5px;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,0.35);margin-bottom:4px}
+.rx-drug{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--teal);margin-bottom:2px}
+.rx-detail{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6}
+.rx-tags{display:flex;gap:7px;margin-top:16px;flex-wrap:wrap}
+.rx-tag{font-size:10px;font-weight:500;padding:4px 11px;border-radius:99px}
+.rx-teal{background:rgba(0,184,164,0.18);color:var(--teal)}
+.rx-ghost{background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.65)}
+
+/* ── AI CHAT ── */
+.chat-wrap{display:flex;flex-direction:column;gap:9px;max-height:210px;overflow-y:auto;padding-right:2px}
+.bubble{padding:10px 13px;border-radius:var(--r);font-size:12px;line-height:1.6;max-width:88%}
+.bai{background:var(--teal-lt);border:1px solid rgba(0,184,164,0.15);color:var(--text-2)}
+.buser{background:var(--deep);color:#fff;margin-left:auto}
+.chat-form{display:flex;gap:8px;margin-top:11px;padding-top:11px;border-top:1px solid var(--border)}
+.chat-input{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;font-size:12px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s}
+.chat-input:focus{border-color:var(--teal)}
+.chat-send{background:var(--teal);color:#fff;border:none;border-radius:var(--r);padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:background .14s}
+.chat-send:hover{background:var(--teal-dk)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .14s;white-space:nowrap}
+.btn-p{background:var(--teal);color:#fff}.btn-p:hover{background:var(--teal-dk)}
+.btn-o{background:transparent;color:var(--text-2);border:1px solid var(--border)}.btn-o:hover{background:var(--surface-2)}
+.btn-danger{background:var(--crimson);color:#fff}.btn-danger:hover{opacity:.88}
+.btn-sm{padding:5px 11px;font-size:11px}
+
+/* ── FORMS ── */
+.fg{margin-bottom:12px}
+.fl{display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-3);margin-bottom:5px}
+.fc{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;font-size:13px;font-family:var(--sans);color:var(--text);outline:none;transition:border-color .15s}
+.fc:focus{border-color:var(--teal);background:var(--surface)}
+
+/* ── QUICK ACTION ── */
+.qa{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:var(--r);border:1px solid var(--border);cursor:pointer;transition:all .15s;background:var(--surface);margin-bottom:8px}
+.qa:last-child{margin-bottom:0}
+.qa:hover{border-color:var(--teal);background:var(--teal-lt)}
+.qa-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qa-ic svg{width:16px;height:16px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.qa-label{font-size:12.5px;font-weight:500;color:var(--text)}
+.qa-desc{font-size:10.5px;color:var(--text-3);margin-top:1px}
+.qa-arrow{margin-left:auto;color:var(--text-4);font-size:16px;font-weight:300}
+
+/* ── MISC ── */
+.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.mini-card{background:var(--surface-2);border-radius:var(--r);padding:13px 15px;border:1px solid var(--border)}
+.mc-label{font-size:10px;color:var(--text-3);font-weight:500;margin-bottom:4px}
+.mc-val{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--text)}
+.map-ph{background:linear-gradient(135deg,var(--surface-3),var(--mist-2));border:1px solid var(--border);border-radius:var(--r-lg);height:148px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text-4);font-size:12px;margin-bottom:13px}
+.map-ph svg{width:28px;height:28px;stroke:var(--text-4);fill:none;stroke-width:1.5;stroke-linecap:round}
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0 10px}
+.div-line{flex:1;height:1px;background:var(--border)}
+.div-label{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-4);white-space:nowrap}
+.chart-wrap{position:relative;width:100%}
+.spark-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.spark-row:last-child{border-bottom:none}
+.sp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sp-name{flex:1;font-size:12px;font-weight:500;color:var(--text)}
+.sp-qty{font-size:11px;color:var(--text-3);text-align:right;min-width:72px}
+.sp-delta{font-size:11px;font-weight:600;min-width:38px;text-align:right}
+
+/* ── DONUT LEGEND ── */
+.legend-row{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:5px 0}
+.legend-sw{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.legend-label{flex:1;color:var(--text-2)}
+.legend-val{font-weight:600;color:var(--text)}
+
+/* ── STAT MINI TRIPLE ── */
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:14px}
+.s3{padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);text-align:center}
+.s3-val{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--text);letter-spacing:-0.3px}
+.s3-label{font-size:10px;color:var(--text-3);margin-top:3px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ════════════════════════ SIDEBAR ════════════════════════ -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-row">
+      <div class="sb-logo-mark">
+        <svg viewBox="0 0 22 22"><path d="M11 4v14M4 11h14"/></svg>
+      </div>
+      <div>
+        <div class="sb-logo-name">MediLink</div>
+        <div class="sb-logo-tag">Integrated Healthcare Platform</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-role">
+    <button class="sb-rb on" onclick="setRole('doctor',this)">Clinician</button>
+    <button class="sb-rb" onclick="setRole('pharmacy',this)">Pharmacy</button>
+    <button class="sb-rb" onclick="setRole('patient',this)">Patient</button>
+  </div>
+
+  <!-- Clinician Nav -->
+  <div class="sb-nav" id="nav-doctor">
+    <div class="sb-section">Overview</div>
+    <button class="sb-link on" onclick="go('doc-home',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      Clinical Dashboard
+    </button>
+    <button class="sb-link" onclick="go('doc-prescribe',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M12 10v8M8 14h8"/></svg></span>
+      Issue Prescription
+      <span class="sb-badge teal">3</span>
+    </button>
+    <div class="sb-section">Patient Management</div>
+    <button class="sb-link" onclick="go('doc-patients',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg></span>
+      Patient Registry
+    </button>
+    <button class="sb-link" onclick="go('doc-interactions',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+      Drug Interactions
+      <span class="sb-badge amber">7</span>
+    </button>
+    <div class="sb-section">Intelligence</div>
+    <button class="sb-link" onclick="go('doc-ai',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.64 5.64l2.12 2.12M16.24 16.24l2.12 2.12M5.64 18.36l2.12-2.12M16.24 7.76l2.12-2.12"/></svg></span>
+      AI Clinical Assistant
+    </button>
+    <button class="sb-link">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+      Clinical Analytics
+    </button>
+  </div>
+
+  <!-- Pharmacy Nav -->
+  <div class="sb-nav" id="nav-pharmacy" style="display:none">
+    <div class="sb-section">Operations</div>
+    <button class="sb-link on" onclick="go('ph-home',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      Operations Dashboard
+    </button>
+    <button class="sb-link" onclick="go('ph-stock',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></span>
+      Inventory Control
+      <span class="sb-badge amber">5</span>
+    </button>
+    <div class="sb-section">Analytics</div>
+    <button class="sb-link" onclick="go('ph-analytics',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+      Demand Forecasting
+    </button>
+    <button class="sb-link">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+      Financial Reports
+    </button>
+    <div class="sb-section">Procurement</div>
+    <button class="sb-link">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.99-1.83L23 6H6"/></svg></span>
+      Supplier Orders
+    </button>
+  </div>
+
+  <!-- Patient Nav -->
+  <div class="sb-nav" id="nav-patient" style="display:none">
+    <div class="sb-section">My Health</div>
+    <button class="sb-link on" onclick="go('pt-home',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      Health Overview
+    </button>
+    <button class="sb-link" onclick="go('pt-rx',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+      Active Prescriptions
+      <span class="sb-badge teal">2</span>
+    </button>
+    <div class="sb-section">Services</div>
+    <button class="sb-link" onclick="go('pt-locate',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+      Locate Pharmacy
+    </button>
+    <button class="sb-link" onclick="go('pt-ai',this)">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span>
+      Health Assistant
+    </button>
+    <div class="sb-section">Account</div>
+    <button class="sb-link">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+      Insurance &amp; Coverage
+    </button>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-ava" id="sb-ava">DR</div>
+    <div>
+      <div class="sb-uname" id="sb-name">Dr. Samuel Osei</div>
+      <div class="sb-urole" id="sb-role">Cardiologist · KHC Kigali</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════════ MAIN ════════════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-title" id="tb-title">Clinical Operations Dashboard</div>
+      <div class="tb-sub" id="tb-sub">Monday, 27 April 2026 · Kigali Healthcare Centre</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Search patients, drugs…
+      </div>
+      <div class="tb-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <div class="ndot"></div>
+      </div>
+      <div class="tb-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <div class="tb-status">
+        <div class="tb-status-dot"></div>
+        System Operational
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+  <!-- ═════════════════════════════════════════════
+       CLINICIAN — HOME DASHBOARD
+  ═════════════════════════════════════════════ -->
+  <div class="dash on" id="dash-doc-home">
+
+    <div class="kpi-row kpi4">
+      <div class="kpi k-teal">
+        <div class="kpi-icon" style="background:var(--teal-lt)">
+          <svg viewBox="0 0 24 24" style="stroke:var(--teal)"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <div class="kpi-label">Patients Seen Today</div>
+        <div class="kpi-value">24</div>
+        <div class="kpi-delta up">↑ 3 vs. prior day</div>
+      </div>
+      <div class="kpi k-sky">
+        <div class="kpi-icon" style="background:var(--sky-lt)">
+          <svg viewBox="0 0 24 24" style="stroke:var(--sky)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M12 10v8M8 14h8"/></svg>
+        </div>
+        <div class="kpi-label">Prescriptions Issued</div>
+        <div class="kpi-value">18</div>
+        <div class="kpi-delta up">↑ 12% this week</div>
+      </div>
+      <div class="kpi k-amber">
+        <div class="kpi-icon" style="background:var(--amber-lt)">
+          <svg viewBox="0 0 24 24" style="stroke:var(--amber)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="kpi-label">Drug Interaction Alerts</div>
+        <div class="kpi-value">3</div>
+        <div class="kpi-delta dn">1 critical — action required</div>
+      </div>
+      <div class="kpi k-crimson">
+        <div class="kpi-icon" style="background:var(--crimson-lt)">
+          <svg viewBox="0 0 24 24" style="stroke:var(--crimson)"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+        </div>
+        <div class="kpi-label">Low-Stock Medications</div>
+        <div class="kpi-value">7</div>
+        <div class="kpi-delta dn">Across 4 partner pharmacies</div>
+      </div>
+    </div>
+
+    <div class="g g-21">
+      <!-- Consultation log -->
+      <div class="card">
+        <div class="card-h">
+          <div>
+            <div class="card-title">Patient Consultation Log</div>
+            <div class="card-subtitle">Today's encounters — sorted by most recent</div>
+          </div>
+          <button class="btn btn-o btn-sm">Export CSV</button>
+        </div>
+        <div class="card-body" style="padding-top:10px">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Diagnosis (ICD-10)</th>
+                <th>Medication Prescribed</th>
+                <th>Dispense Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="tw">Alice Mutesi</div><div class="tsm">F, 34 · #P-2841</div></td>
+                <td>Essential Hypertension (I10)</td>
+                <td>Amlodipine 5 mg OD</td>
+                <td><span class="b b-ok">Dispensed</span></td>
+                <td><button class="btn btn-o btn-sm">View</button></td>
+              </tr>
+              <tr>
+                <td><div class="tw">Jean-Pierre Nkurunziza</div><div class="tsm">M, 52 · #P-1093</div></td>
+                <td>Type 2 Diabetes Mellitus (E11)</td>
+                <td>Metformin 500 mg BD</td>
+                <td><span class="b b-warn">Pending Collection</span></td>
+                <td><button class="btn btn-o btn-sm">View</button></td>
+              </tr>
+              <tr>
+                <td><div class="tw">Grace Uwimana</div><div class="tsm">F, 28 · #P-3312</div></td>
+                <td>Community-Acquired Pneumonia (J18)</td>
+                <td>Amoxicillin 500 mg TDS</td>
+                <td><span class="b b-info">In Transit</span></td>
+                <td><button class="btn btn-o btn-sm">View</button></td>
+              </tr>
+              <tr>
+                <td><div class="tw">Robert Habimana</div><div class="tsm">M, 61 · #P-0892</div></td>
+                <td>Atrial Fibrillation (I48)</td>
+                <td>Warfarin 5 mg OD</td>
+                <td><span class="b b-err">⚠ Interaction Flagged</span></td>
+                <td><button class="btn btn-danger btn-sm">Review</button></td>
+              </tr>
+              <tr>
+                <td><div class="tw">Marie Kayitesi</div><div class="tsm">F, 45 · #P-2204</div></td>
+                <td>Bronchial Asthma (J45)</td>
+                <td>Salbutamol 100 mcg Inhaler</td>
+                <td><span class="b b-ok">Dispensed</span></td>
+                <td><button class="btn btn-o btn-sm">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Alerts + timeline -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <div class="card-h"><div class="card-title">Clinical Alerts</div><span class="b b-err">3 Active</span></div>
+          <div class="card-body" style="padding-top:10px">
+            <div class="al al-err">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span><strong>Severe Drug Interaction:</strong> Warfarin + Ibuprofen — R. Habimana. Markedly elevated haemorrhagic risk. Immediate clinical review required.</span>
+            </div>
+            <div class="al al-warn">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+              <span><strong>Critical Stock Alert:</strong> Atorvastatin 20 mg — 12 units remaining at CityPharm Central. Reorder initiated.</span>
+            </div>
+            <div class="al al-info">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Real-time stock update received from 3 partner pharmacies. Metformin 500 mg availability confirmed.</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><div class="card-title">Activity Timeline</div></div>
+          <div class="card-body" style="padding-top:12px">
+            <div class="tl">
+              <div class="tl-ev"><div class="tl-dot"></div><div class="tl-time">09:12</div><div class="tl-text">Amlodipine 5 mg prescribed — A. Mutesi (Essential Hypertension)</div></div>
+              <div class="tl-ev"><div class="tl-dot crim"></div><div class="tl-time">09:41</div><div class="tl-text">Drug interaction flagged: Warfarin + Ibuprofen — R. Habimana. Clinician alert dispatched.</div></div>
+              <div class="tl-ev"><div class="tl-dot amb"></div><div class="tl-time">10:05</div><div class="tl-text">Low-stock threshold breached: Atorvastatin 20 mg at CityPharm Central.</div></div>
+              <div class="tl-ev"><div class="tl-dot sky"></div><div class="tl-time">10:28</div><div class="tl-text">Prescription #RX-4421 successfully dispensed — Kigali Health Depot.</div></div>
+              <div class="tl-ev"><div class="tl-dot"></div><div class="tl-time">11:00</div><div class="tl-text">3 follow-up consultations added to afternoon schedule (14:00–16:00).</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g g-2">
+      <!-- Real-time availability -->
+      <div class="card">
+        <div class="card-h"><div><div class="card-title">Real-Time Medication Availability</div><div class="card-subtitle">Search radius: 5 km from Kigali Healthcare Centre</div></div><span class="b b-teal">GPS Active</span></div>
+        <div class="card-body" style="padding-top:10px">
+          <div class="sr"><div class="sdot" style="background:var(--jade)"></div><div style="flex:1"><div class="sname">CityPharm Central</div><div class="smeta">Amlodipine 5mg · Metformin 500mg — RSSB, MMI accepted</div></div><div class="sdist">0.8 km</div><div class="sprice">RWF 2,400</div></div>
+          <div class="sr"><div class="sdot" style="background:var(--jade)"></div><div style="flex:1"><div class="sname">Kigali Health Depot</div><div class="smeta">Amoxicillin 500mg · Warfarin 5mg — All insurers</div></div><div class="sdist">1.2 km</div><div class="sprice">RWF 1,800</div></div>
+          <div class="sr"><div class="sdot" style="background:var(--amber)"></div><div style="flex:1"><div class="sname">MedPlus Nyarugenge</div><div class="smeta">Atorvastatin 20mg — critical stock (12 units remaining)</div></div><div class="sdist">2.1 km</div><div class="sprice">RWF 3,100</div></div>
+          <div class="sr"><div class="sdot" style="background:var(--crimson)"></div><div style="flex:1"><div class="sname">GreenCross Pharmacy</div><div class="smeta">Warfarin 5mg — out of stock</div></div><div class="sdist">3.0 km</div><div class="sprice">—</div></div>
+        </div>
+      </div>
+
+      <!-- Weekly chart -->
+      <div class="card">
+        <div class="card-h"><div><div class="card-title">Weekly Prescription Volume</div><div class="card-subtitle">Issued prescriptions — current calendar week</div></div><span class="b b-ok">↑ 12% vs. last week</span></div>
+        <div class="card-body">
+          <div class="chart-wrap" style="height:168px">
+            <canvas id="c-rxweek" role="img" aria-label="Bar chart of prescriptions issued per day this week: Mon 12, Tue 15, Wed 18, Thu 14, Fri 20, Sat 10, Sun 8">Mon 12, Tue 15, Wed 18, Thu 14, Fri 20, Sat 10, Sun 8</canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /doc-home -->
+
+  <!-- ═════════════════════════════════════════════
+       CLINICIAN — PRESCRIBE
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-doc-prescribe">
+    <div class="g g-21">
+      <div class="card">
+        <div class="card-h">
+          <div><div class="card-title">Issue New Prescription</div><div class="card-subtitle">Automated drug interaction screening and real-time formulary stock verification</div></div>
+          <span class="b b-teal">AI-Verified</span>
+        </div>
+        <div class="card-body">
+          <div class="g g-2" style="margin-bottom:0">
+            <div class="fg"><label class="fl">Patient Name / Registry ID</label><input class="fc" value="Jean-Pierre Nkurunziza" placeholder="Search patient registry…"/></div>
+            <div class="fg"><label class="fl">Primary Diagnosis (ICD-10)</label><input class="fc" value="E11 — Type 2 Diabetes Mellitus"/></div>
+          </div>
+          <div class="fg"><label class="fl">Medication (International Non-proprietary Name)</label><input class="fc" value="Metformin 500 mg" placeholder="Search national formulary database…"/></div>
+          <div class="g g-3" style="margin-bottom:0">
+            <div class="fg"><label class="fl">Strength / Dose</label><input class="fc" value="500 mg"/></div>
+            <div class="fg"><label class="fl">Dosage Frequency</label><input class="fc" value="Twice daily (BD)"/></div>
+            <div class="fg"><label class="fl">Treatment Duration</label><input class="fc" value="30 days"/></div>
+          </div>
+          <div class="fg"><label class="fl">Clinical Notes &amp; Special Instructions</label><textarea class="fc" rows="2" placeholder="Additional instructions, dietary advice, contraindication notes…" style="resize:none"></textarea></div>
+          <div class="al al-ok" style="margin-bottom:13px">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>Verification passed.</strong> Metformin 500 mg is in stock at 3 partner pharmacies within 2.1 km. No clinically significant drug interactions identified with documented current medications. RSSB insurance coverage confirmed at 80% for this INN.</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-p">Issue Prescription</button>
+            <button class="btn btn-o">+ Add Second Medication</button>
+            <button class="btn btn-o">Save as Draft</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <div class="card-h"><div class="card-title">Patient Clinical Summary</div></div>
+          <div class="card-body" style="font-size:12px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--sky-lt);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--sky);flex-shrink:0">JP</div>
+              <div>
+                <div style="font-weight:600;font-size:13.5px;color:var(--text)">Jean-Pierre Nkurunziza</div>
+                <div style="color:var(--text-3);font-size:11px">M, 52 yrs · Blood Group A+ · DOB: 12 March 1974</div>
+              </div>
+            </div>
+            <div style="margin-bottom:11px">
+              <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-4);margin-bottom:6px">Current Medications on Record</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap"><span class="b b-teal">Metformin 500 mg</span><span class="b b-info">Lisinopril 10 mg</span><span class="b b-vi">Aspirin 81 mg</span></div>
+            </div>
+            <div style="margin-bottom:11px">
+              <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-4);margin-bottom:6px">Documented Drug Allergies</div>
+              <span class="b b-err">Penicillin — anaphylaxis on record</span>
+            </div>
+            <div>
+              <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-4);margin-bottom:6px">Insurance &amp; Reimbursement</div>
+              <div style="color:var(--jade);font-weight:600;font-size:12.5px">✓ RSSB — 80% formulary coverage · Active</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><div class="card-title">Stock at Nearest Partner Pharmacies</div></div>
+          <div class="card-body" style="padding-top:8px">
+            <div class="sr"><div class="sdot" style="background:var(--jade)"></div><div class="sname">CityPharm Central</div><div class="sdist">0.8 km</div><div class="sprice">RWF 1,200</div></div>
+            <div class="sr"><div class="sdot" style="background:var(--jade)"></div><div class="sname">Kigali Health Depot</div><div class="sdist">1.2 km</div><div class="sprice">RWF 1,100</div></div>
+            <div class="sr"><div class="sdot" style="background:var(--amber)"></div><div class="sname">MedPlus Nyarugenge</div><div class="sdist">2.1 km</div><div class="sprice">RWF 1,300</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       CLINICIAN — PATIENT REGISTRY
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-doc-patients">
+    <div class="mini-grid">
+      <div class="mini-card"><div class="mc-label">Total Registered Patients</div><div class="mc-val">1,284</div></div>
+      <div class="mini-card"><div class="mc-label">Consultations This Month</div><div class="mc-val">318</div></div>
+      <div class="mini-card"><div class="mc-label">Awaiting Follow-Up Review</div><div class="mc-val" style="color:var(--amber)">47</div></div>
+    </div>
+    <div class="card">
+      <div class="card-h">
+        <div class="card-title">Patient Registry</div>
+        <div style="display:flex;gap:8px">
+          <input class="fc" style="width:200px" placeholder="Search by name, ID or diagnosis…"/>
+          <button class="btn btn-p btn-sm">+ Enrol New Patient</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:10px">
+        <table class="tbl">
+          <thead><tr><th>Patient</th><th>Age / Sex</th><th>Primary Diagnosis</th><th>Last Consultation</th><th>Insurance Cover</th><th>Clinical Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><div class="tw">Alice Mutesi</div><div class="tsm">#P-2841</div></td><td>34, F</td><td>Essential Hypertension (I10)</td><td>Today</td><td><span class="b b-ok">RSSB 80%</span></td><td><span class="b b-ok">Active</span></td><td><button class="btn btn-o btn-sm">Open Record</button></td></tr>
+            <tr><td><div class="tw">Jean-Pierre Nkurunziza</div><div class="tsm">#P-1093</div></td><td>52, M</td><td>Type 2 Diabetes Mellitus (E11)</td><td>Today</td><td><span class="b b-ok">MMI 70%</span></td><td><span class="b b-warn">Rx Pending</span></td><td><button class="btn btn-o btn-sm">Open Record</button></td></tr>
+            <tr><td><div class="tw">Grace Uwimana</div><div class="tsm">#P-3312</div></td><td>28, F</td><td>Community-Acquired Pneumonia (J18)</td><td>Yesterday</td><td><span class="b b-neu">Uninsured</span></td><td><span class="b b-ok">Active</span></td><td><button class="btn btn-o btn-sm">Open Record</button></td></tr>
+            <tr><td><div class="tw">Robert Habimana</div><div class="tsm">#P-0892</div></td><td>61, M</td><td>Atrial Fibrillation (I48)</td><td>Today</td><td><span class="b b-ok">RSSB 85%</span></td><td><span class="b b-err">⚠ Alert</span></td><td><button class="btn btn-danger btn-sm">Review Now</button></td></tr>
+            <tr><td><div class="tw">Marie Kayitesi</div><div class="tsm">#P-2204</div></td><td>45, F</td><td>Bronchial Asthma (J45)</td><td>3 days ago</td><td><span class="b b-ok">MMI 75%</span></td><td><span class="b b-ok">Active</span></td><td><button class="btn btn-o btn-sm">Open Record</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       CLINICIAN — DRUG INTERACTIONS
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-doc-interactions">
+    <div class="kpi-row kpi3">
+      <div class="kpi k-crimson">
+        <div class="kpi-icon" style="background:var(--crimson-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--crimson)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="kpi-label">Severe Interactions</div><div class="kpi-value">3</div>
+        <div class="kpi-delta dn">Immediate clinical review</div>
+      </div>
+      <div class="kpi k-amber">
+        <div class="kpi-icon" style="background:var(--amber-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+        <div class="kpi-label">Moderate Interactions</div><div class="kpi-value">8</div>
+        <div class="kpi-delta neu">Close monitoring required</div>
+      </div>
+      <div class="kpi k-sky">
+        <div class="kpi-icon" style="background:var(--sky-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--sky)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+        <div class="kpi-label">Minor Interactions</div><div class="kpi-value">14</div>
+        <div class="kpi-delta neu">Informational — monitor</div>
+      </div>
+    </div>
+    <div class="g g-2">
+      <div class="card">
+        <div class="card-h"><div><div class="card-title">Interaction Checker</div><div class="card-subtitle">Screen any two or more pharmacological agents for contraindications</div></div></div>
+        <div class="card-body">
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <input class="fc" placeholder="Primary agent (e.g. Warfarin)" style="flex:1"/>
+            <input class="fc" placeholder="Secondary agent (e.g. Ibuprofen)" style="flex:1"/>
+          </div>
+          <button class="btn btn-p" style="width:100%;justify-content:center;margin-bottom:14px">Run Pharmacological Interaction Analysis</button>
+          <div class="divider"><div class="div-line"></div><div class="div-label">Analysis Result</div><div class="div-line"></div></div>
+          <div class="ix ix-sev">
+            <div class="ix-title" style="color:var(--crimson)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Severity: SEVERE — Concurrent Use Contraindicated
+            </div>
+            <div class="ix-drugs">Warfarin (Anticoagulant / VKA) + Ibuprofen (NSAID)</div>
+            <div class="ix-desc">Concurrent administration significantly potentiates anticoagulant activity. Ibuprofen inhibits platelet aggregation and competitively displaces warfarin from plasma protein binding sites, elevating free-drug concentration and substantially increasing haemorrhagic risk — including gastrointestinal haemorrhage and intracranial bleeding. <strong>Clinical recommendation:</strong> Substitute ibuprofen with paracetamol (acetaminophen) for analgesia. If NSAID therapy is clinically unavoidable, obtain haematology consultation, intensify INR monitoring (twice weekly), and counsel the patient on bleeding warning signs.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-title">Recently Flagged Interactions</div><span class="b b-err">3 requiring review</span></div>
+        <div class="card-body" style="padding-top:10px">
+          <div class="ix ix-sev">
+            <div class="ix-title" style="color:var(--crimson)">SEVERE — Warfarin + Ibuprofen</div>
+            <div class="ix-drugs">Patient: Robert Habimana (#P-0892)</div>
+            <div class="ix-desc">Immediate INR monitoring and therapeutic substitution required. Haematology referral recommended.</div>
+          </div>
+          <div class="ix ix-mod">
+            <div class="ix-title" style="color:var(--amber)">MODERATE — Metformin + Iodinated Contrast Media</div>
+            <div class="ix-drugs">Patient: Jean-Pierre Nkurunziza (#P-1093)</div>
+            <div class="ix-desc">Withhold metformin 48 hours prior to and following iodinated contrast administration. Elevated risk of lactic acidosis in the context of contrast-induced nephropathy.</div>
+          </div>
+          <div class="ix ix-mod">
+            <div class="ix-title" style="color:var(--amber)">MODERATE — Aspirin + Lisinopril</div>
+            <div class="ix-drugs">Patient: Marie Kayitesi (#P-2204)</div>
+            <div class="ix-desc">High-dose aspirin may attenuate the antihypertensive efficacy of ACE inhibitors. Monitor blood pressure and renal indices at each clinical review.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       CLINICIAN — AI ASSISTANT
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-doc-ai">
+    <div class="g g-21">
+      <div class="card">
+        <div class="card-h">
+          <div><div class="card-title">AI Clinical Decision Support</div><div class="card-subtitle">Evidence-based guidance — supplementary to clinical judgement and not a substitute</div></div>
+          <span class="b b-vi">✦ Active</span>
+        </div>
+        <div class="card-body">
+          <div class="chat-wrap" id="chat-doc">
+            <div class="bubble bai">Good morning, Dr. Osei. I can assist with pharmacological queries, dosage verification, drug interaction screening, differential diagnosis support, and clinical protocol references. How may I support you today?</div>
+            <div class="bubble buser">What is the maximum safe dose of Metformin for a patient with CKD Stage 2?</div>
+            <div class="bubble bai">For CKD Stage 2 (eGFR 60–89 mL/min/1.73m²), Metformin is generally considered safe with appropriate monitoring. The recommended maximum daily dose is <strong>2,000–2,550 mg</strong> administered in divided doses with meals. Key clinical considerations: (1) Monitor eGFR every 3–6 months; (2) Discontinue if eGFR falls below 30 mL/min/1.73m²; (3) Temporarily withhold 48 hrs before and after procedures involving iodinated contrast media. Current NICE (NG28) and ADA Standards of Care support continued use at this eGFR threshold. Recommend reviewing the patient's most recent renal function panel (serum creatinine, eGFR, urine ACR) before initiating or continuing therapy.</div>
+          </div>
+          <div class="chat-form">
+            <input class="chat-input" id="in-doc" placeholder="Enter a clinical query — dosing, interactions, protocols, guidelines…" onkeydown="if(event.key==='Enter')chat('doc')"/>
+            <button class="chat-send" onclick="chat('doc')">Send</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-title">Clinical Reference Library</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:0;padding-top:10px">
+          <div class="qa"><div class="qa-ic" style="background:var(--sky-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--sky)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="qa-label">WHO Essential Medicines List (EML) 2023</div><div class="qa-desc">Updated global formulary and dosage reference</div></div><div class="qa-arrow">›</div></div>
+          <div class="qa"><div class="qa-ic" style="background:var(--jade-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--jade)"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div class="qa-label">Rwanda Standard Treatment Guidelines</div><div class="qa-desc">Ministry of Health national clinical protocols</div></div><div class="qa-arrow">›</div></div>
+          <div class="qa"><div class="qa-ic" style="background:var(--amber-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div><div><div class="qa-label">ISMP High-Alert Medication Protocols</div><div class="qa-desc">Institute for Safe Medication Practices guidelines</div></div><div class="qa-arrow">›</div></div>
+          <div class="qa"><div class="qa-ic" style="background:var(--crimson-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--crimson)"><polyline points="22 12 16 12 14 15 10 9 8 12 2 12"/></svg></div><div><div class="qa-label">BLS / ACLS Emergency Protocols</div><div class="qa-desc">Resuscitation, anaphylaxis &amp; toxicology management</div></div><div class="qa-arrow">›</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       PHARMACY — HOME DASHBOARD
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-ph-home">
+    <div class="kpi-row kpi4">
+      <div class="kpi k-teal">
+        <div class="kpi-icon" style="background:var(--teal-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+        <div class="kpi-label">Total Active SKUs</div><div class="kpi-value">342</div>
+        <div class="kpi-delta up">↑ 12 added this week</div>
+      </div>
+      <div class="kpi k-amber">
+        <div class="kpi-icon" style="background:var(--amber-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="kpi-label">Expiring Within 30 Days</div><div class="kpi-value">18</div>
+        <div class="kpi-delta dn">Review &amp; rotation required</div>
+      </div>
+      <div class="kpi k-crimson">
+        <div class="kpi-icon" style="background:var(--crimson-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--crimson)"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
+        <div class="kpi-label">Out-of-Stock Lines</div><div class="kpi-value">5</div>
+        <div class="kpi-delta dn">Procurement action required</div>
+      </div>
+      <div class="kpi k-jade">
+        <div class="kpi-icon" style="background:var(--jade-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--jade)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <div class="kpi-label">Today's Revenue (RWF)</div><div class="kpi-value">842K</div>
+        <div class="kpi-delta up">↑ 8% vs. daily average</div>
+      </div>
+    </div>
+
+    <div class="g g-21">
+      <div class="card">
+        <div class="card-h"><div><div class="card-title">Inventory Status Overview</div><div class="card-subtitle">Real-time stock levels — reorder thresholds highlighted</div></div></div>
+        <div class="card-body">
+          <div class="prog-row">
+            <div class="prog-meta"><span style="font-size:12px;font-weight:500">Metformin 500 mg</span><span style="font-size:11px;color:var(--jade);font-weight:600">847 units — Adequate</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:84%;background:var(--teal)"></div></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-meta"><span style="font-size:12px;font-weight:500">Amlodipine 5 mg</span><span style="font-size:11px;color:var(--jade);font-weight:600">523 units — Adequate</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:65%;background:var(--sky)"></div></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-meta"><span style="font-size:12px;font-weight:500">Amoxicillin 500 mg</span><span style="font-size:11px;color:var(--amber);font-weight:600">124 units — Below Reorder Level</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:30%;background:var(--amber)"></div></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-meta"><span style="font-size:12px;font-weight:500">Lisinopril 10 mg</span><span style="font-size:11px;color:var(--amber);font-weight:600">98 units — Below Reorder Level</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:22%;background:var(--amber)"></div></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-meta"><span style="font-size:12px;font-weight:500">Atorvastatin 20 mg</span><span style="font-size:11px;color:var(--crimson);font-weight:600">12 units — Critical</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:5%;background:var(--crimson)"></div></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-meta"><span style="font-size:12px;font-weight:500">Warfarin 5 mg</span><span style="font-size:11px;color:var(--crimson);font-weight:600">0 units — Out of Stock</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:0%;background:var(--crimson)"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><div class="card-title">Daily Revenue — Current Week</div><div class="card-subtitle">Transaction volume in RWF thousands</div></div></div>
+        <div class="card-body">
+          <div class="chart-wrap" style="height:220px">
+            <canvas id="c-phrev" role="img" aria-label="Bar chart of pharmacy daily revenue this week in thousands of Rwandan francs">Mon 580K, Tue 620K, Wed 710K, Thu 650K, Fri 842K, Sat 490K, Sun 380K</canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g g-2">
+      <div class="card">
+        <div class="card-h"><div class="card-title">Prescription Fulfilment Breakdown</div><div class="card-subtitle" style="margin-top:1px">By insurance type — this month</div></div>
+        <div class="card-body">
+          <div style="display:flex;gap:16px;align-items:center">
+            <div style="width:140px;height:140px;flex-shrink:0">
+              <canvas id="c-phdoughnut" role="img" aria-label="Doughnut chart of prescriptions by insurance: RSSB 52%, MMI 26%, Uninsured 14%, Other 8%">RSSB 52%, MMI 26%, Uninsured 14%, Other 8%</canvas>
+            </div>
+            <div style="flex:1">
+              <div class="legend-row"><div class="legend-sw" style="background:#00b8a4"></div><div class="legend-label">RSSB</div><div class="legend-val">52%</div></div>
+              <div class="legend-row"><div class="legend-sw" style="background:#1a77d4"></div><div class="legend-label">MMI</div><div class="legend-val">26%</div></div>
+              <div class="legend-row"><div class="legend-sw" style="background:#d4860a"></div><div class="legend-label">Uninsured (OOP)</div><div class="legend-val">14%</div></div>
+              <div class="legend-row"><div class="legend-sw" style="background:#5b7a99"></div><div class="legend-label">Other / Private</div><div class="legend-val">8%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-title">Active Clinical Alerts</div></div>
+        <div class="card-body" style="padding-top:10px">
+          <div class="al al-err">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span><strong>Out-of-Stock — Warfarin 5 mg:</strong> 4 pending prescriptions require fulfilment. Contact approved supplier for expedited delivery. Patients should be notified via the platform.</span>
+          </div>
+          <div class="al al-err">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span><strong>Expiry Alert — Amoxicillin 500 mg</strong> (Batch AM-2024-11): Expires November 2025. Initiate stock rotation and supplier return procedures immediately.</span>
+          </div>
+          <div class="al al-warn">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+            <span><strong>Critical Stock — Atorvastatin 20 mg:</strong> 12 units remaining. Automatic reorder requisition raised. Estimated delivery: 48–72 hours.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       PHARMACY — INVENTORY CONTROL
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-ph-stock">
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-h">
+        <div><div class="card-title">Inventory Control Centre</div><div class="card-subtitle">All formulary lines — quantities, pricing, expiry dates and procurement status</div></div>
+        <div style="display:flex;gap:8px">
+          <input class="fc" style="width:190px" placeholder="Search formulary…"/>
+          <button class="btn btn-p btn-sm">+ Receive Stock</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:10px">
+        <table class="tbl">
+          <thead><tr><th>Medicine (INN)</th><th>Pharmacological Class</th><th>Batch No.</th><th>Stock (units)</th><th>Unit Price (RWF)</th><th>Expiry Date</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td class="tw">Metformin 500 mg</td><td>Antidiabetic (Biguanide)</td><td>MF-2024-08</td><td>847</td><td>1,200</td><td>Aug 2026</td><td><span class="b b-ok">Adequate</span></td><td><button class="btn btn-o btn-sm">Edit</button></td></tr>
+            <tr><td class="tw">Amoxicillin 500 mg</td><td>Antibiotic (Aminopenicillin)</td><td>AM-2024-11</td><td>124</td><td>800</td><td>Nov 2025</td><td><span class="b b-warn">Reorder Required</span></td><td><button class="btn btn-o btn-sm">Reorder</button></td></tr>
+            <tr><td class="tw">Atorvastatin 20 mg</td><td>Lipid-Lowering Agent (Statin)</td><td>AT-2024-09</td><td>12</td><td>3,100</td><td>Sep 2025</td><td><span class="b b-err">Critical Stock</span></td><td><button class="btn btn-p btn-sm">Order Now</button></td></tr>
+            <tr><td class="tw">Warfarin 5 mg</td><td>Anticoagulant (Vitamin K Antagonist)</td><td>—</td><td>0</td><td>2,200</td><td>—</td><td><span class="b b-err">Out of Stock</span></td><td><button class="btn btn-danger btn-sm">Emergency Order</button></td></tr>
+            <tr><td class="tw">Amlodipine 5 mg</td><td>Antihypertensive (CCB)</td><td>AL-2025-01</td><td>523</td><td>950</td><td>Jan 2027</td><td><span class="b b-ok">Adequate</span></td><td><button class="btn btn-o btn-sm">Edit</button></td></tr>
+            <tr><td class="tw">Lisinopril 10 mg</td><td>Antihypertensive (ACE Inhibitor)</td><td>LI-2025-03</td><td>98</td><td>1,050</td><td>Mar 2026</td><td><span class="b b-warn">Reorder Required</span></td><td><button class="btn btn-o btn-sm">Reorder</button></td></tr>
+            <tr><td class="tw">Salbutamol 100 mcg</td><td>Bronchodilator (SABA)</td><td>SA-2025-06</td><td>312</td><td>2,800</td><td>Jun 2027</td><td><span class="b b-ok">Adequate</span></td><td><button class="btn btn-o btn-sm">Edit</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       PHARMACY — DEMAND ANALYTICS
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-ph-analytics">
+    <div class="g g-2">
+      <div class="card">
+        <div class="card-h"><div><div class="card-title">Top-Dispensed Medications — This Month</div><div class="card-subtitle">Volume by INN · April 2026</div></div></div>
+        <div class="card-body" style="padding-top:10px">
+          <div class="spark-row"><div class="sp-dot" style="background:var(--teal)"></div><div class="sp-name">Metformin 500 mg</div><div class="sp-qty">1,240 units</div><div class="sp-delta up">↑ 18%</div></div>
+          <div class="spark-row"><div class="sp-dot" style="background:var(--sky)"></div><div class="sp-name">Amlodipine 5 mg</div><div class="sp-qty">980 units</div><div class="sp-delta up">↑ 12%</div></div>
+          <div class="spark-row"><div class="sp-dot" style="background:var(--jade)"></div><div class="sp-name">Amoxicillin 500 mg</div><div class="sp-qty">762 units</div><div class="sp-delta up">↑ 5%</div></div>
+          <div class="spark-row"><div class="sp-dot" style="background:var(--violet)"></div><div class="sp-name">Lisinopril 10 mg</div><div class="sp-qty">634 units</div><div class="sp-delta" style="color:var(--crimson)">↓ 2%</div></div>
+          <div class="spark-row"><div class="sp-dot" style="background:var(--amber)"></div><div class="sp-name">Atorvastatin 20 mg</div><div class="sp-qty">541 units</div><div class="sp-delta" style="color:var(--crimson)">↓ 3%</div></div>
+          <div class="spark-row"><div class="sp-dot" style="background:var(--text-3)"></div><div class="sp-name">Salbutamol 100 mcg</div><div class="sp-qty">428 units</div><div class="sp-delta up">↑ 7%</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><div class="card-title">AI-Powered Demand Forecast</div><div class="card-subtitle">Predictive restocking recommendations — next 30 days</div></div><span class="b b-vi">AI Active</span></div>
+        <div class="card-body" style="padding-top:10px">
+          <div class="al al-info">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span><strong>Metformin 500 mg:</strong> Demand forecasted to increase 22% in May 2026, driven by seasonal uptick in diabetes management consultations. Recommended procurement: 600+ units minimum.</span>
+          </div>
+          <div class="al al-warn">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+            <span><strong>Amoxicillin 500 mg:</strong> Elevated respiratory illness incidence anticipated Q2 2026. Stock target of 450+ units recommended to prevent supply-demand gap.</span>
+          </div>
+          <div class="al al-ok">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>Amlodipine 5 mg:</strong> Current inventory is adequate for projected Q2 2026 demand. No procurement action required at this time.</span>
+          </div>
+          <div class="al al-err">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span><strong>Warfarin 5 mg:</strong> Zero stock. Emergency procurement required. 4 active prescriptions cannot be fulfilled. Escalate to procurement manager immediately.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><div><div class="card-title">Monthly Revenue Trend — January to December 2026</div><div class="card-subtitle">Total dispensing revenue in RWF millions</div></div></div>
+      <div class="card-body">
+        <div class="chart-wrap" style="height:190px">
+          <canvas id="c-phtrend" role="img" aria-label="Line chart of monthly pharmacy revenue trend across 12 months in 2026">Jan 14M, Feb 13M, Mar 15M, Apr 16M, May 14M, Jun 17M, Jul 18M, Aug 16M, Sep 19M, Oct 20M, Nov 18M, Dec 22M</canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       PATIENT — HOME DASHBOARD
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-pt-home">
+    <div class="kpi-row kpi3">
+      <div class="kpi k-teal">
+        <div class="kpi-icon" style="background:var(--teal-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M12 10v8M8 14h8"/></svg></div>
+        <div class="kpi-label">Active Prescriptions</div><div class="kpi-value">2</div>
+        <div class="kpi-delta up">Both dispensable nearby</div>
+      </div>
+      <div class="kpi k-amber">
+        <div class="kpi-icon" style="background:var(--amber-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="kpi-label">Next Medication Refill</div><div class="kpi-value">May 3</div>
+        <div class="kpi-delta dn">Metformin 500 mg — 6 days</div>
+      </div>
+      <div class="kpi k-jade">
+        <div class="kpi-icon" style="background:var(--jade-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--jade)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="kpi-label">Insurance Coverage</div><div class="kpi-value">80%</div>
+        <div class="kpi-delta up">RSSB — Active &amp; Verified</div>
+      </div>
+    </div>
+
+    <div class="g g-21">
+      <div>
+        <div class="rx-hero">
+          <div class="rx-label">Current Active Prescription</div>
+          <div class="rx-drug">Metformin 500 mg</div>
+          <div class="rx-detail">Twice daily with meals (BD) · 30-day course</div>
+          <div class="rx-detail">Prescribed by Dr. Samuel Osei, Cardiologist · 27 April 2026 · Ref #RX-4421</div>
+          <div class="rx-tags">
+            <span class="rx-tag rx-teal">✓ RSSB Covered — 80%</span>
+            <span class="rx-tag rx-ghost">In Stock at 3 Nearby Pharmacies</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><div><div class="card-title">Partner Pharmacies Stocking Your Medications</div><div class="card-subtitle">Verified real-time stock — insurance compatibility shown</div></div><span class="b b-teal">Live</span></div>
+          <div class="card-body" style="padding-top:8px">
+            <div class="sr"><div class="sdot" style="background:var(--jade)"></div><div style="flex:1"><div class="sname">CityPharm Central</div><div class="smeta">All 2 prescribed medications in stock · RSSB &amp; MMI accepted</div></div><div class="sdist">0.8 km</div><div class="sprice">RWF 2,400</div></div>
+            <div class="sr"><div class="sdot" style="background:var(--jade)"></div><div style="flex:1"><div class="sname">Kigali Health Depot</div><div class="smeta">Metformin in stock · RSSB accepted · Lower unit price</div></div><div class="sdist">1.2 km</div><div class="sprice">RWF 1,400</div></div>
+            <div class="sr"><div class="sdot" style="background:var(--amber)"></div><div style="flex:1"><div class="sname">MedPlus Nyarugenge</div><div class="smeta">Partial stock — 1 of 2 medications available</div></div><div class="sdist">2.1 km</div><div class="sprice">RWF 1,800</div></div>
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <button class="btn btn-p">View on Map</button>
+              <button class="btn btn-o">Get Directions</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <div class="card-h"><div class="card-title">My Health Profile</div></div>
+          <div class="card-body" style="font-size:12px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--teal-lt);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--teal-dk);flex-shrink:0">JP</div>
+              <div>
+                <div style="font-weight:600;font-size:13.5px">Jean-Pierre Nkurunziza</div>
+                <div style="color:var(--text-3);font-size:11px">M, 52 yrs · Patient ID #P-1093</div>
+              </div>
+            </div>
+            <div style="margin-bottom:11px">
+              <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-4);margin-bottom:6px">Diagnosed Conditions</div>
+              <span class="b b-info">Type 2 Diabetes Mellitus (E11)</span>
+            </div>
+            <div style="margin-bottom:11px">
+              <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-4);margin-bottom:6px">Documented Drug Allergies</div>
+              <span class="b b-err">Penicillin — anaphylaxis on record</span>
+            </div>
+            <div>
+              <div style="font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-4);margin-bottom:6px">Insurance Status</div>
+              <div style="color:var(--jade);font-weight:600">✓ RSSB — Active · 80% formulary coverage</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><div class="card-title">Upcoming Appointments</div></div>
+          <div class="card-body" style="padding-top:12px">
+            <div class="tl">
+              <div class="tl-ev"><div class="tl-dot amb"></div><div class="tl-time">3 May 2026</div><div class="tl-text">Metformin 500 mg refill due — prescription expires. Visit a nearby pharmacy.</div></div>
+              <div class="tl-ev"><div class="tl-dot sky"></div><div class="tl-time">5 May 2026 · 10:00</div><div class="tl-text">Follow-up consultation — Dr. Samuel Osei, KHC Kigali</div></div>
+              <div class="tl-ev"><div class="tl-dot"></div><div class="tl-time">20 May 2026</div><div class="tl-text">HbA1c &amp; renal function blood test — KHC Diagnostic Laboratory</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       PATIENT — ACTIVE PRESCRIPTIONS
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-pt-rx">
+    <div class="card">
+      <div class="card-h"><div><div class="card-title">Active Prescriptions</div><div class="card-subtitle">Issued by your attending clinician — verified against your insurance cover and formulary</div></div></div>
+      <div class="card-body" style="padding-top:10px">
+        <table class="tbl">
+          <thead><tr><th>Medication (INN)</th><th>Prescribing Clinician</th><th>Dosage Regimen</th><th>Treatment Duration</th><th>Insurance Reimbursement</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="tw">Metformin 500 mg</div><div class="tsm">Issued 3 April 2026 · Reference #RX-4421</div></td>
+              <td>Dr. Samuel Osei</td>
+              <td>500 mg twice daily (BD) with meals</td>
+              <td>30 days</td>
+              <td><span class="b b-ok">RSSB — 80%</span></td>
+              <td><span class="b b-ok">Active</span></td>
+            </tr>
+            <tr>
+              <td><div class="tw">Lisinopril 10 mg</div><div class="tsm">Issued 18 March 2026 · Reference #RX-4198</div></td>
+              <td>Dr. Samuel Osei</td>
+              <td>10 mg once daily (OD), in the morning</td>
+              <td>60 days</td>
+              <td><span class="b b-ok">RSSB — 80%</span></td>
+              <td><span class="b b-warn">Refill Due in 12 Days</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       PATIENT — LOCATE PHARMACY
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-pt-locate">
+    <div class="card">
+      <div class="card-h"><div><div class="card-title">Locate a Partner Pharmacy</div><div class="card-subtitle">Real-time stock and insurance compatibility across all registered pharmacies in your area</div></div><span class="b b-teal">GPS Enabled</span></div>
+      <div class="card-body">
+        <div style="display:flex;gap:8px;margin-bottom:13px">
+          <input class="fc" value="Metformin 500 mg" placeholder="Search by medication name or INN…" style="flex:1"/>
+          <button class="btn btn-p">Search</button>
+          <button class="btn btn-o">Filter</button>
+        </div>
+        <div class="map-ph">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Interactive geolocation map — GPS-enabled pharmacy finder</span>
+          <span style="font-size:10.5px">Displaying 4 pharmacies within 5 km</span>
+        </div>
+        <div class="sr"><div class="sdot" style="background:var(--jade)"></div><div style="flex:1"><div class="sname">CityPharm Central</div><div class="smeta">In stock: 847 units · RSSB, MMI &amp; private insurers accepted · Open until 20:00</div></div><div class="sdist">0.8 km</div><div class="sprice">RWF 1,200</div></div>
+        <div class="sr"><div class="sdot" style="background:var(--jade)"></div><div style="flex:1"><div class="sname">Kigali Health Depot</div><div class="smeta">In stock: 412 units · RSSB accepted · Open until 19:00</div></div><div class="sdist">1.2 km</div><div class="sprice">RWF 1,100</div></div>
+        <div class="sr"><div class="sdot" style="background:var(--amber)"></div><div style="flex:1"><div class="sname">MedPlus Nyarugenge</div><div class="smeta">Low stock: 45 units · RSSB accepted · Open until 18:30</div></div><div class="sdist">2.1 km</div><div class="sprice">RWF 1,300</div></div>
+        <div class="sr"><div class="sdot" style="background:var(--crimson)"></div><div style="flex:1"><div class="sname">GreenCross Pharmacy</div><div class="smeta">Out of stock — contact pharmacy for restock ETA</div></div><div class="sdist">3.0 km</div><div class="sprice">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════════════════════
+       PATIENT — HEALTH ASSISTANT
+  ═════════════════════════════════════════════ -->
+  <div class="dash" id="dash-pt-ai">
+    <div class="g g-21">
+      <div class="card">
+        <div class="card-h">
+          <div><div class="card-title">Personal Health Assistant</div><div class="card-subtitle">AI-powered guidance — informational only · Always consult your treating clinician</div></div>
+          <span class="b b-vi">✦ Active</span>
+        </div>
+        <div class="card-body">
+          <div class="chat-wrap" id="chat-pt">
+            <div class="bubble bai">Hello, Jean-Pierre. I'm your MediLink health assistant. I can provide general health guidance, information about your prescribed medications, and direct you to appropriate care. For medical emergencies, please call <strong>912</strong> immediately or attend your nearest emergency department.</div>
+            <div class="bubble buser">I missed my morning dose of Metformin today. What should I do?</div>
+            <div class="bubble bai">If you have missed your morning dose of Metformin, take it as soon as you remember — <strong>unless</strong> it is close to the time of your next scheduled dose. In that case, skip the missed dose entirely and resume your regular dosing schedule at the next meal. Never administer a double dose to compensate for a missed one, as this may increase the risk of gastrointestinal side effects. If you frequently miss doses, consider setting a daily alarm reminder. For personalised advice, please contact Dr. Osei's clinic directly or speak with your pharmacist at your next visit.</div>
+          </div>
+          <div class="chat-form">
+            <input class="chat-input" id="in-pt" placeholder="Ask about your medications, symptoms, or care options…" onkeydown="if(event.key==='Enter')chat('pt')"/>
+            <button class="chat-send" onclick="chat('pt')">Send</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-title">First Aid &amp; Emergency Protocols</div></div>
+        <div class="card-body" style="padding-top:10px">
+          <div class="qa"><div class="qa-ic" style="background:var(--crimson-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--crimson)"><polyline points="22 12 16 12 14 15 10 9 8 12 2 12"/></svg></div><div><div class="qa-label">Cardiac Arrest — CPR Protocol</div><div class="qa-desc">Hands-only CPR and AED deployment guidance</div></div><div class="qa-arrow">›</div></div>
+          <div class="qa"><div class="qa-ic" style="background:var(--amber-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="qa-label">Wound Care &amp; Haemorrhage Control</div><div class="qa-desc">Direct pressure, wound closure and tourniquet application</div></div><div class="qa-arrow">›</div></div>
+          <div class="qa"><div class="qa-ic" style="background:var(--violet-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--violet)"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div><div><div class="qa-label">Anaphylaxis — Emergency Response Protocol</div><div class="qa-desc">Epinephrine administration and post-event escalation</div></div><div class="qa-arrow">›</div></div>
+          <div class="qa"><div class="qa-ic" style="background:var(--jade-lt)"><svg viewBox="0 0 24 24" style="stroke:var(--jade)"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div><div><div class="qa-label">Hypoglycaemia — Recognition &amp; Initial Response</div><div class="qa-desc">Blood glucose correction guidance for diabetic patients</div></div><div class="qa-arrow">›</div></div>
+          <div style="margin-top:13px;text-align:center;font-size:11px;color:var(--text-3);line-height:1.6">Medical Emergency Hotline: <strong style="color:var(--crimson);font-size:12px">912</strong><br>Rwanda Emergency Medical Services</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ─── ROLE CONFIG ───
+const ROLES = {
+  doctor:{initials:'DR',name:'Dr. Samuel Osei',role:'Cardiologist · KHC Kigali',title:'Clinical Operations Dashboard',sub:'Monday, 27 April 2026 · Kigali Healthcare Centre',nav:'nav-doctor',home:'doc-home'},
+  pharmacy:{initials:'CP',name:'CityPharm Central',role:'Pharmacy Manager · Kigali',title:'Pharmacy Operations Dashboard',sub:'Monday, 27 April 2026 · Kigali City Centre',nav:'nav-pharmacy',home:'ph-home'},
+  patient:{initials:'JP',name:'Jean-Pierre Nkurunziza',role:'Patient · Registry #P-1093',title:'Patient Health Dashboard',sub:'Monday, 27 April 2026 · Kigali, Rwanda',nav:'nav-patient',home:'pt-home'}
+};
+
+const TITLES = {
+  'doc-home':'Clinical Operations Dashboard','doc-prescribe':'Issue New Prescription','doc-patients':'Patient Registry','doc-interactions':'Drug Interaction Checker','doc-ai':'AI Clinical Decision Support',
+  'ph-home':'Pharmacy Operations Dashboard','ph-stock':'Inventory Control Centre','ph-analytics':'Demand Forecasting & Analytics',
+  'pt-home':'Patient Health Dashboard','pt-rx':'Active Prescriptions','pt-locate':'Locate a Pharmacy','pt-ai':'Personal Health Assistant'
+};
+
+function setRole(r, btn) {
+  document.querySelectorAll('.sb-rb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  ['nav-doctor','nav-pharmacy','nav-patient'].forEach(id => document.getElementById(id).style.display='none');
+  const cfg = ROLES[r];
+  document.getElementById(cfg.nav).style.display='block';
+  document.getElementById('sb-ava').textContent = cfg.initials;
+  document.getElementById('sb-name').textContent = cfg.name;
+  document.getElementById('sb-role').textContent = cfg.role;
+  document.getElementById('tb-title').textContent = cfg.title;
+  document.getElementById('tb-sub').textContent = cfg.sub;
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('on'));
+  const fl = document.querySelector('#'+cfg.nav+' .sb-link');
+  if(fl) fl.classList.add('on');
+  switchDash(cfg.home);
+}
+
+function go(id, el) {
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('on'));
+  if(el) el.classList.add('on');
+  if(TITLES[id]) document.getElementById('tb-title').textContent = TITLES[id];
+  switchDash(id);
+}
+
+function switchDash(id) {
+  document.querySelectorAll('.dash').forEach(d => d.classList.remove('on'));
+  const el = document.getElementById('dash-'+id);
+  if(el) el.classList.add('on');
+  // init charts on first show
+  if(id==='doc-home') setTimeout(initRxWeek, 60);
+  if(id==='ph-home') setTimeout(()=>{initPhRev();initPhDoughnut();}, 60);
+  if(id==='ph-analytics') setTimeout(initPhTrend, 60);
+}
+
+// ─── CHARTS ───
+let charts = {};
+
+function mkChart(id, cfg) {
+  const ctx = document.getElementById(id);
+  if(!ctx || charts[id]) return;
+  charts[id] = new Chart(ctx, cfg);
+}
+
+const FONT = {size:10.5, family:"'Sora',sans-serif"};
+const GRID = '#e0e9f4';
+const TICK = '#8fa9c4';
+
+function initRxWeek() {
+  mkChart('c-rxweek', {
+    type:'bar',
+    data:{
+      labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets:[{
+        label:'Prescriptions issued',
+        data:[12,15,18,14,20,10,8],
+        backgroundColor:['#00b8a4','#00b8a4','#00b8a4','#00b8a4','#1a77d4','#00b8a4','#00b8a4'],
+        borderRadius:5,borderSkipped:false
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>' '+v.raw+' Rx issued'}}},scales:{x:{grid:{display:false},ticks:{font:FONT,color:TICK}},y:{grid:{color:GRID},ticks:{font:FONT,color:TICK,stepSize:5},beginAtZero:true}}}
+  });
+}
+
+function initPhRev() {
+  mkChart('c-phrev', {
+    type:'bar',
+    data:{
+      labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets:[{
+        label:'Revenue (RWF)',
+        data:[580,620,710,650,842,490,380],
+        backgroundColor:['#1a77d4','#1a77d4','#1a77d4','#1a77d4','#00b8a4','#1a77d4','#1a77d4'],
+        borderRadius:5,borderSkipped:false
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>' RWF '+v.raw+'K'}}},scales:{x:{grid:{display:false},ticks:{font:FONT,color:TICK}},y:{grid:{color:GRID},ticks:{font:FONT,color:TICK,callback:v=>v+'K'},beginAtZero:true}}}
+  });
+}
+
+function initPhDoughnut() {
+  mkChart('c-phdoughnut', {
+    type:'doughnut',
+    data:{
+      labels:['RSSB','MMI','Uninsured (OOP)','Other / Private'],
+      datasets:[{data:[52,26,14,8],backgroundColor:['#00b8a4','#1a77d4','#d4860a','#5b7a99'],borderWidth:2,borderColor:'#ffffff',hoverOffset:4}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'}
+  });
+}
+
+function initPhTrend() {
+  mkChart('c-phtrend', {
+    type:'line',
+    data:{
+      labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      datasets:[{
+        label:'Revenue (RWF M)',
+        data:[14,13,15,16,14,17,18,16,19,20,18,22],
+        borderColor:'#00b8a4',backgroundColor:'rgba(0,184,164,0.07)',
+        borderWidth:2,pointBackgroundColor:'#00b8a4',pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:4,tension:0.4,fill:true
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>' RWF '+v.raw+'M'}}},scales:{x:{grid:{display:false},ticks:{font:FONT,color:TICK}},y:{grid:{color:GRID},ticks:{font:FONT,color:TICK,callback:v=>v+'M'},beginAtZero:false}}}
+  });
+}
+
+// ─── AI CHAT ───
+const AI_DOC = "Based on current clinical evidence and established guidelines, I recommend reviewing the patient's complete medication history alongside the relevant laboratory parameters. For detailed protocol guidance, consult the Rwanda Standard Treatment Guidelines or the WHO Essential Medicines List. This response is AI-assisted — clinical verification is mandatory before implementing any therapeutic decision.";
+const AI_PT = "That's a helpful question. For personalised guidance specific to your condition and medications, I recommend consulting Dr. Osei or contacting the clinic directly. If you are experiencing an acute medical emergency, please call <strong>912</strong> immediately or attend your nearest emergency department. I am here to support — not replace — professional medical care.";
+
+function chat(who) {
+  const inputId = who==='doc' ? 'in-doc' : 'in-pt';
+  const chatId  = who==='doc' ? 'chat-doc' : 'chat-pt';
+  const inp = document.getElementById(inputId);
+  const box = document.getElementById(chatId);
+  const val = inp.value.trim();
+  if(!val) return;
+  const ub = document.createElement('div');
+  ub.className = 'bubble buser';
+  ub.textContent = val;
+  box.appendChild(ub);
+  inp.value = '';
+  box.scrollTop = box.scrollHeight;
+  setTimeout(() => {
+    const ab = document.createElement('div');
+    ab.className = 'bubble bai';
+    ab.innerHTML = who==='doc' ? AI_DOC : AI_PT;
+    box.appendChild(ab);
+    box.scrollTop = box.scrollHeight;
+  }, 900);
+}
+
+// ─── INIT ───
+setTimeout(initRxWeek, 200);
+</script>
+</body>
+</html>
